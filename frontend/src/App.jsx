@@ -58,6 +58,13 @@ const App = () => {
     alert('Ideas: Show suggestions for new tasks');
   };
 
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      localStorage.removeItem('token');
+      window.location.reload();
+    }
+  };
+
   const handleMenuClick = () => {
     alert('Menu: Settings and theme options');
   };
@@ -79,6 +86,7 @@ const App = () => {
           onFocusClick={handleFocusClick}
           onIdeasClick={handleIdeasClick}
           onMenuClick={handleMenuClick}
+          onLogout={handleLogout}
         />
 
         <SearchBar 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Grid2x2, Lightbulb, Menu } from 'lucide-react';
+import { Grid2x2, Lightbulb, Menu, LogOut } from 'lucide-react';
 
-const Header = ({ onFocusClick, onIdeasClick, onMenuClick, focusCount, ideasCount }) => {
+const Header = ({ onFocusClick, onIdeasClick, onMenuClick, onLogout, focusCount, ideasCount }) => {
   const formatDate = () => {
     const options = { weekday: 'long', month: 'long', day: 'numeric' };
     return new Date().toLocaleDateString('en-US', options);
@@ -35,6 +35,15 @@ const Header = ({ onFocusClick, onIdeasClick, onMenuClick, focusCount, ideasCoun
         >
           <Menu size={20} />
         </button>
+        {onLogout && (
+          <button 
+            className="action-btn" 
+            title="Logout" 
+            onClick={onLogout}
+          >
+            <LogOut size={20} />
+          </button>
+        )}
       </div>
     </header>
   );
