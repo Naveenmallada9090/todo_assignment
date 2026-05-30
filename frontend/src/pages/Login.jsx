@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { login } from '../services/api';
 import { LogIn } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,7 +17,7 @@ const Login = () => {
     try {
       const { data } = await login(formData);
       localStorage.setItem('token', data.token);
-      navigate('/dashboard');
+      window.location.href = '/dashboard';
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed');
     } finally {

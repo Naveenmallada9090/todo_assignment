@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import Header from './components/Header';
 import TaskList from './components/TaskList';
@@ -8,6 +8,29 @@ import SearchBar from './components/SearchBar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './styles.css';
+
+const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  
+  useEffect(() => {
+    const checkAuth = () => {
+      const stored = localStorage.getItem('token');
+      if (stored !== token) {
+        setToken(stored);
+      }
+    };
+    window.addEventListener('storage', checkAuth);
+    return () => window.removeEventListener('storage', checkAuth);
+  }, [token]);
+
+  return children(token);
+};
+
+const AppContent = () => {
+  const token = localStorage.getItem('token');
+  
+  return token ? <Dashboard /> : <Navigate to="/login" replace />;
+};
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([
@@ -69,7 +92,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('token');
-      navigate('/login');
+      window.location.href = '/login';
     }
   };
 
@@ -141,24 +164,14 @@ const Dashboard = () => {
   );
 };
 
-const AppContent = () => {
-  const token = localStorage.getItem('token');
-
-  return (
-    <Routes>
-      <Route path="/" element={
-        token ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
-      } />
-      <Route path="/login" element={!token ? <Login /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/register" element={!token ? <Register /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" replace />} />
-    </Routes>
-  );
-};
-
 const App = () => (
   <Router>
-    <AppContent />
+    <Routes>
+      <Route path="/" element={<AppContent />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/dashboard" element={<AppContent />} />
+    </Routes>
   </Router>
 );
 
