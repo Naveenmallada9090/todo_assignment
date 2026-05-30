@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import Header from './components/Header';
 import TaskList from './components/TaskList';
 import CompletedTasks from './components/CompletedTasks';
 import SearchBar from './components/SearchBar';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import './styles.css';
 
-const App = () => {
+const Dashboard = () => {
   const [tasks, setTasks] = useState([
     { id: 1, title: 'turbine', completed: false, favorite: false },
     { id: 2, title: 'rust', completed: true, favorite: false },
@@ -15,6 +18,7 @@ const App = () => {
   const [newTask, setNewTask] = useState('');
   const [search, setSearch] = useState('');
   const [completedCollapsed, setCompletedCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   const handleAddTask = (e) => {
     e.preventDefault();
@@ -58,15 +62,15 @@ const App = () => {
     alert('Ideas: Show suggestions for new tasks');
   };
 
+  const handleMenuClick = () => {
+    alert('Menu: Settings and theme options');
+  };
+
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
       localStorage.removeItem('token');
-      window.location.reload();
+      navigate('/login');
     }
-  };
-
-  const handleMenuClick = () => {
-    alert('Menu: Settings and theme options');
   };
 
   const filteredTasks = tasks.filter(task =>
@@ -75,12 +79,12 @@ const App = () => {
 
   const completedCount = tasks.filter(t => t.completed).length;
   const focusCount = tasks.filter(t => t.favorite && !t.completed).length;
-  const ideasCount = 3; // Sample suggestions count
+  const ideasCount = 3;
 
   return (
     <div className="app-container">
       <div className="content-wrapper">
-        <Header 
+        <Header
           focusCount={focusCount}
           ideasCount={ideasCount}
           onFocusClick={handleFocusClick}
@@ -89,7 +93,7 @@ const App = () => {
           onLogout={handleLogout}
         />
 
-        <SearchBar 
+        <SearchBar
           search={search}
           onSearch={handleSearch}
           onClear={handleClearSearch}
@@ -114,10 +118,10 @@ const App = () => {
           </div>
         ) : (
           <>
-            <TaskList 
-              tasks={filteredTasks} 
-              onToggle={handleToggle} 
-              onFavorite={handleFavorite} 
+            <TaskList
+              tasks={filteredTasks}
+              onToggle={handleToggle}
+              onFavorite={handleFavorite}
               onDelete={handleDelete}
             />
 
@@ -136,5 +140,26 @@ const App = () => {
     </div>
   );
 };
+
+const AppContent = () => {
+  const token = localStorage.getItem('token');
+
+  return (
+    <Routes>
+      <Route path="/" element={
+        token ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+      } />
+      <Route path="/login" element={!token ? <Login /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/register" element={!token ? <Register /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" replace />} />
+    </Routes>
+  );
+};
+
+const App = () => (
+  <Router>
+    <AppContent />
+  </Router>
+);
 
 export default App;
